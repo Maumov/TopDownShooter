@@ -15,11 +15,18 @@ public class Player : LivingEntity {
 	// Use this for initialization
 	protected  override void Start () {
 		base.Start();
+
+	}
+	void Awake(){
 		controller = GetComponent<PlayerController>();
 		viewCamera = Camera.main;
 		gunController = GetComponent<GunController>();
+		FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
 	}
-	
+	void OnNewWave(int waveNumber){
+		health = startingHealth;
+		gunController.EquipGun(waveNumber -1);
+	}
 	// Update is called once per frame
 	void Update () {
 
@@ -44,6 +51,12 @@ public class Player : LivingEntity {
 			controller.LookAt(point);
 			crosshairs.transform.position = point;
 			crosshairs.DetectTargets(ray);
+			if(((new Vector2(point.x,point.z) - new Vector2(transform.position.x,transform.position.z)).sqrMagnitude) > 1f){
+				gunController.Aim(point);
+			}
+
+
+			//Debug.Log(new Vector2(point.x,point.z) - new Vector2(transform.position.x,transform.position.z).magnitude);
 		}
 
 		//weapon input
@@ -53,5 +66,17 @@ public class Player : LivingEntity {
 		if(Input.GetButtonUp("Fire1")){
 			gunController.OnTriggerRelease();
 		}
+		if(Input.GetButtonDown("R")){
+			
+			gunController.Reload();
+		}
+		if(transform.position.y < -10f){
+			TakeDamage(health);
+		}
+	}
+	public override void Die ()
+	{
+		AudioManager.instance.PlaySound("Player Death", transform.position);
+		base.Die ();
 	}
 }
