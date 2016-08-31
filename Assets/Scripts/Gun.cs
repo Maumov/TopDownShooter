@@ -27,7 +27,7 @@ public class Gun : MonoBehaviour {
 
 	MuzzleFlash muzzleFlash;
 	float nextShotTime;
-	bool triggerReleasedSinceLastShot;
+	bool triggerReleasedSinceLastShot = true;
 	int shotsRemainingInBurst;
 	int projectilesRemainingInMag;
 	bool isReloading;
@@ -54,20 +54,30 @@ public class Gun : MonoBehaviour {
 
 	void Shoot(){
 		if(!isReloading && Time.time > nextShotTime && projectilesRemainingInMag > 0){
+			
 			if(firemode ==FireMode.Burst){
+				
 				if(shotsRemainingInBurst == 0){
+					
 					return;
 				}
+
 				shotsRemainingInBurst--;
 			}else if(firemode ==FireMode.Single){
+				
 				if(!triggerReleasedSinceLastShot){
+					
 					return;
 				}
 			}
+
 			for(int i = 0; i < projectileSpawn.Length; i++){
+				
 				if(projectilesRemainingInMag == 0){
+					
 					break;
 				}
+
 				projectilesRemainingInMag --;
 				nextShotTime = Time.time + msBetweenShots / 1000f;
 				Projectile newProjectile = Instantiate (projectile,projectileSpawn[i].position,projectileSpawn[i].rotation) as Projectile;
